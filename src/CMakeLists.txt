@@ -1,13 +1,6 @@
 set (PROJECT_SOURCES
     main.c
-
-    # core
-
-    # utils
-
-    # concurrency
-
-    # modules
+    ${CORE_SOURCES}
 )
 
 add_executable(${PROJECT_NAME}
