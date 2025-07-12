@@ -25,4 +25,4 @@ jobs:
 
       - name: Run client test
         run: |
-            ./build/client_test
+            ./build/bin/Hydra && ./build/bin/client_test
