@@ -25,4 +25,4 @@ jobs:
 
       - name: Run client test
         run: |
-            ./build/client_test || echo "Expected fail -> Server Not running"
+            ./build/client_test
