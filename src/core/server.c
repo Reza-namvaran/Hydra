@@ -5,19 +5,29 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include "server.h"
+#include "request.h"
 
 void handle_request(int client_fd) {
-    const char *response =
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/plain\r\n"  // Specify the content type
-        "Connection: close\r\n"
-        "\r\n"  // End of headers
-        "Hello, Server!\r\n";  // Response body
+    char buffer[BUFFER_SIZE];
+    int received = recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
+    if (received <= 0) {
+        close(client_fd);
+        return;
+    }
+    buffer[received] = '\0';
 
-    // Send the response
-    send(client_fd, response, strlen(response), 0);
+    HttpRequest req;
+    if (parse_http_request(buffer, received, &req) == 0) {
+        printf("Method: %s\nPath: %s\nVersion: %s\nContent-Length: %d\n", req.method, req.path, req.version, req.content_len);
+        if (req.content_len > 0) {
+            printf("Body: %.*s\n", req.content_len, req.body);
+        }
+        /// TODO: route request and send response here
+    } else {
+        const char *bad_req = "HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n";
+        send(client_fd, bad_req, strlen(bad_req), 0);
+    }
 
-    // Close the connection
     close(client_fd);
 }
 
